@@ -1,0 +1,67 @@
+is_global = true
+build_property.TargetFramework = net10.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = LienWorksSharp
+build_property.RootNamespace = LienWorksSharp
+build_property.ProjectDir = C:\Users\Jacob\source\repos\LeinWorksSharp\LienWorksSharp\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\Jacob\source\repos\LeinWorksSharp\LienWorksSharp
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Pages/Clients/ClientDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50c1xDbGllbnREZXRhaWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Pages/Clients/Clients.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50c1xDbGllbnRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Pages/Templates/GlobalTemplates.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVtcGxhdGVzXEdsb2JhbFRlbXBsYXRlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Pages/WorkOrders.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV29ya09yZGVycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-rlps3y2wbc
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-6sqh6fi7a8
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jacob/source/repos/LeinWorksSharp/LienWorksSharp/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 

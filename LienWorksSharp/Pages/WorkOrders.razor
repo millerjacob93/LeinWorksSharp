@@ -1,0 +1,92 @@
+@page "/"
+@page "/workorders"
+@inherits LienWorksSharp.Pages.WorkOrdersPage
+
+<PageTitle>Work Orders | LienWorksSharp</PageTitle>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">Work Orders</h1>
+        <p class="text-muted mb-0">Landing page showing the newest work orders first.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 30%;">Client</th>
+                    <th style="width: 30%;">Work Order</th>
+                    <th style="width: 20%;">Supplied / Created</th>
+                    <th style="width: 20%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (WorkOrders.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted p-4">No work orders yet.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var order in WorkOrders)
+                    {
+                        var isExpanded = ExpandedIds.Contains(order.Id);
+                        <tr class="cursor-pointer" @onclick="() => Toggle(order.Id)">
+                            <td class="fw-semibold">@order.ClientName</td>
+                            <td>@order.Name</td>
+                            <td>@order.SuppliedDate.ToLocalTime().ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <span class="badge @order.Status.ToBadgeClass()">@order.Status.ToDisplayName()</span>
+                            </td>
+                        </tr>
+                        @if (order.Jobs.Any() && isExpanded)
+                        {
+                            <tr class="table-secondary">
+                                <td colspan="4" class="p-0">
+                                    <div class="p-3 bg-body">
+                                        <h6 class="text-uppercase text-muted fw-bold small mb-2">Jobs</h6>
+                                        <table class="table table-sm table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 30%;">Address</th>
+                                                    <th style="width: 15%;">County</th>
+                                                    <th style="width: 20%;">Owner</th>
+                                                    <th style="width: 20%;">Required Documents</th>
+                                                    <th style="width: 15%;">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var job in order.Jobs)
+                                                {
+                                                    <tr>
+                                                        <td>@job.Address</td>
+                                                        <td>@job.County</td>
+                                                        <td>@job.Owner</td>
+                                                        <td>
+                                                            <div class="d-flex flex-wrap gap-1">
+                                                                @foreach (var doc in job.RequiredDocuments)
+                                                                {
+                                                                    <span class="badge bg-light text-dark border">@doc.ToDisplayName()</span>
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge @job.Status.ToBadgeClass()">@job.Status.ToDisplayName()</span>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,296 @@
+@page "/clients/{id:guid}"
+@inherits LienWorksSharp.Pages.ClientDetailPage
+
+<PageTitle>Client Detail | LienWorksSharp</PageTitle>
+
+@if (IsLoading)
+{
+    <p class="text-muted">Loading client...</p>
+}
+else if (Client == null)
+{
+    <div class="alert alert-warning">Client not found.</div>
+}
+else
+{
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h1 class="h3 mb-1">@Client.Name</h1>
+            <p class="text-muted mb-0">Manage client details, templates, and contacts.</p>
+        </div>
+        <button class="btn btn-outline-secondary" @onclick="GoBack">Back to Clients</button>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">Client Details</span>
+                    <button class="btn btn-primary btn-sm" type="button" @onclick="SaveDetailsAsync">Save Changes</button>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="Client">
+                        <div class="mb-3">
+                            <label class="form-label">Client Name</label>
+                            <InputText class="form-control" @bind-Value="Client.Name" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <InputText class="form-control" @bind-Value="Client.Address" />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Default Required Documents</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var doc in DocumentTypes)
+                                {
+                                    <div class="form-check">
+                                        <InputCheckbox class="form-check-input" @bind-Value="docSelections[doc]" />
+                                        <label class="form-check-label">@doc.ToDisplayName()</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">Contacts</span>
+                    <button class="btn btn-primary btn-sm" @onclick="() => OpenContactModal(null)">Add Contact</button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Primary</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Client.Contacts.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted p-3">No contacts added.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var contact in Client.Contacts)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@contact.Name</td>
+                                        <td>@contact.Role</td>
+                                        <td>@contact.Email</td>
+                                        <td>@contact.Phone</td>
+                                        <td>
+                                            @if (contact.IsPrimary)
+                                            {
+                                                <span class="badge bg-primary">Primary</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-link btn-sm" @onclick="() => OpenContactModal(contact)">Edit</button>
+                                            <button class="btn btn-link btn-sm text-danger" @onclick="() => DeleteContact(contact.Id)">Delete</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <span class="fw-semibold">Client Templates</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%;">Document</th>
+                                <th style="width: 35%;">Current Template</th>
+                                <th style="width: 25%;">Download</th>
+                                <th style="width: 15%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var doc in DocumentTypes)
+                            {
+                                var template = GetClientTemplate(doc);
+                                <tr>
+                                    <td class="fw-semibold">@doc.ToDisplayName()</td>
+                                    <td>
+                                        @if (template?.Current != null)
+                                        {
+                                            <span>@template.Current.FileName</span>
+                                            <small class="text-muted d-block">Updated @template.Current.UploadedAt.ToLocalTime().ToString("g")</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Using global template</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-secondary btn-sm" href="@(GetTemplateLink(doc))" target="_blank">
+                                            <span class="oi oi-data-transfer-download me-1"></span>Download
+                                        </a>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <button class="btn btn-primary btn-sm" @onclick="() => OpenUploadModal(doc)">Upload / Replace</button>
+                                            <button class="btn btn-outline-secondary btn-sm" @onclick="() => OpenHistory(doc)">History</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (ShowContactModal)
+{
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@ContactModalTitle</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CloseContactModal"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="EditableContact">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Name</label>
+                                <InputText class="form-control" @bind-Value="EditableContact.Name" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Role</label>
+                                <InputText class="form-control" @bind-Value="EditableContact.Role" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <InputText class="form-control" @bind-Value="EditableContact.Email" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <InputText class="form-control" @bind-Value="EditableContact.Phone" />
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <InputCheckbox class="form-check-input" @bind-Value="EditableContact.IsPrimary" />
+                                    <label class="form-check-label">Primary Contact</label>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link" type="button" @onclick="CloseContactModal">Cancel</button>
+                    <button class="btn btn-primary" type="button" @onclick="SaveContactAsync">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@if (ShowUploadModal && UploadingType.HasValue)
+{
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload @UploadingType.Value.ToDisplayName()</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CloseUploadModal"></button>
+                </div>
+                <div class="modal-body">
+                    <InputFile OnChange="OnFileSelected" />
+                    @if (!string.IsNullOrWhiteSpace(SelectedFileName))
+                    {
+                        <p class="mt-2 text-muted">Selected: @SelectedFileName</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link" type="button" @onclick="CloseUploadModal">Cancel</button>
+                    <button class="btn btn-primary" type="button" @onclick="SaveTemplateAsync" disabled="@(!CanUpload)">Upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
+@if (ShowHistoryModal && HistoryType.HasValue)
+{
+    var history = GetClientTemplate(HistoryType.Value);
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@HistoryType.Value.ToDisplayName() History</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CloseHistory"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>File Name</th>
+                                <th>Uploaded</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (history?.Versions.Any() == true)
+                            {
+                                @foreach (var version in history.Versions)
+                                {
+                                    var isCurrent = history.CurrentId == version.Id;
+                                    <tr class="@(isCurrent ? "table-success" : string.Empty)">
+                                        <td>@version.FileName</td>
+                                        <td>@version.UploadedAt.ToLocalTime().ToString("g")</td>
+                                        <td class="text-end">
+                                            <div class="btn-group">
+                                                <a class="btn btn-sm btn-outline-secondary" href="@ClientService.GetDownloadPath(version)" target="_blank">Download</a>
+                                                @if (!isCurrent)
+                                                {
+                                                    <button class="btn btn-sm btn-primary" @onclick="() => UseVersionAsync(HistoryType!.Value, version.Id)">Use this</button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted p-3">No uploads yet.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link" type="button" @onclick="CloseHistory">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}

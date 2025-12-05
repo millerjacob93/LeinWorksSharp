@@ -1,0 +1,121 @@
+@page "/clients"
+@inherits LienWorksSharp.Pages.ClientsPage
+
+<PageTitle>Clients | LienWorksSharp</PageTitle>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">Clients</h1>
+        <p class="text-muted mb-0">Manage clients, contacts, and template overrides.</p>
+    </div>
+    <button class="btn btn-primary" @onclick="OpenAddModal">
+        <span class="oi oi-plus me-1"></span>
+        Add Client
+    </button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 20%;">Client Name</th>
+                    <th style="width: 20%;">Address</th>
+                    <th style="width: 20%;">Default Required Documents</th>
+                    <th style="width: 15%;">Primary Contact</th>
+                    <th style="width: 15%;">Templates</th>
+                    <th style="width: 10%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Clients.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted p-4">No clients yet.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var client in Clients)
+                    {
+                        var primary = GetPrimaryContact(client);
+                        <tr class="cursor-pointer" @ondblclick="() => GoToClient(client.Id)">
+                            <td class="fw-semibold">@client.Name</td>
+                            <td>@client.Address</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var doc in client.DefaultRequiredDocuments)
+                                    {
+                                        <span class="badge bg-light text-dark border">@doc.ToDisplayName()</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>@(primary?.Name ?? "—")</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var doc in DocumentTypes)
+                                    {
+                                        var current = GetClientTemplate(client, doc);
+                                        var css = current != null ? "btn-outline-primary" : "btn-outline-secondary";
+                                        <a class="btn btn-sm @css" href="@(current?.DownloadUrl ?? GetGlobalTemplateUrl(doc) ?? "#")" target="_blank">
+                                            @doc.ToDisplayName()
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-outline-primary btn-sm" @onclick="() => GoToClient(client.Id)">Manage</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (ShowAddModal)
+{
+    <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Client</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="CloseAddModal"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="NewClient" OnValidSubmit="SaveClientAsync">
+                        <DataAnnotationsValidator />
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Client Name</label>
+                                <InputText class="form-control" @bind-Value="NewClient.Name" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Address</label>
+                                <InputText class="form-control" @bind-Value="NewClient.Address" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Default Required Documents</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var doc in DocumentTypes)
+                                    {
+                                        <div class="form-check">
+                                            <InputCheckbox class="form-check-input" @bind-Value="docSelections[doc]" />
+                                            <label class="form-check-label">@doc.ToDisplayName()</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-link" type="button" @onclick="CloseAddModal">Cancel</button>
+                    <button class="btn btn-primary" type="button" @onclick="SaveClientAsync">Save Client</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
